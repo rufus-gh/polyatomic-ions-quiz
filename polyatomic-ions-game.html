@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Polyatomic Ion Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+        }
+
+        .container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .popup-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            z-index: 1000;
+        }
+
+        .popup {
+            font-weight: bold;
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 10px;
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+        }
+
+        .correct {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .incorrect {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        #score {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Polyatomic Ion Quiz</h1>
+        <div id="quiz">
+            <p id="formula"></p>
+            <input type="text" id="answer" placeholder="Enter the name" autocomplete="off" onkeypress="handleKeyPress(event)">
+            <button onclick="checkAnswer()">Submit</button>
+        </div>
+        <div id="score"></div>
+    </div>
+    <div class="popup-container" id="popup-container"></div>
+    <script>
+        const ions = {
+            "NH<sub>4</sub><sup>+</sup>": ["ammonium"],
+            "NO<sub>2</sub><sup>-</sup>": ["nitrite"],
+            "NO<sub>3</sub><sup>-</sup>": ["nitrate"],
+            "SO<sub>3</sub><sup>2-</sup>": ["sulfite", "sulphite"],
+            "SO<sub>4</sub><sup>2-</sup>": ["sulfate", "sulphate"],
+            "OH<sup>-</sup>": ["hydroxide"],
+            "PO<sub>3</sub><sup>3-</sup>": ["phosphite"],
+            "PO<sub>4</sub><sup>3-</sup>": ["phosphate"],
+            "ClO<sub>2</sub><sup>-</sup>": ["chlorite"],
+            "ClO<sub>3</sub><sup>-</sup>": ["chlorate"],
+            "C<sub>2</sub>H<sub>3</sub>O<sub>2</sub><sup>-</sup>": ["acetate"],
+            "CO<sub>3</sub><sup>2-</sup>": ["carbonate"],
+            "O<sub>2</sub><sup>2-</sup>": ["peroxide"],
+            "CN<sup>-</sup>": ["cyanide"]
+        };
+
+        let correct = 0;
+        let total = 0;
+
+        function getRandomIon() {
+            const keys = Object.keys(ions);
+            return keys[Math.floor(Math.random() * keys.length)];
+        }
+
+        function displayNextQuestion() {
+            const formula = getRandomIon();
+            document.getElementById('formula').innerHTML = formula;
+            document.getElementById('answer').value = '';
+        }
+
+        function checkAnswer() {
+            const formula = document.getElementById('formula').innerHTML;
+            const userAnswer = document.getElementById('answer').value.trim().toLowerCase();
+            const correctAnswers = ions[formula].map(answer => answer.toLowerCase());
+
+            const resultDiv = document.createElement('div');
+            resultDiv.className = 'popup';
+            if (correctAnswers.includes(userAnswer)) {
+                correct++;
+                resultDiv.classList.add('correct');
+                resultDiv.innerHTML = '✔ Correct!';
+            } else {
+                resultDiv.classList.add('incorrect');
+                resultDiv.innerHTML = `✘ Incorrect! The correct answer is ${ions[formula].join(' or ')}.`;
+            }
+
+            const popupContainer = document.getElementById('popup-container');
+            popupContainer.insertBefore(resultDiv, popupContainer.firstChild);
+            resultDiv.style.opacity = 1;
+        /*    setTimeout(() => {
+                resultDiv.style.opacity = 1;
+            }, 10);
+        */
+
+            setTimeout(() => {
+                resultDiv.style.opacity = 0;
+                setTimeout(() => {
+                    popupContainer.removeChild(resultDiv);
+                }, 500);
+            }, 1000);
+
+            total++;
+            document.getElementById('score').innerText = `Score: ${correct}/${total}`;
+            displayNextQuestion();
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                checkAnswer();
+            }
+        }
+
+        window.onload = displayNextQuestion;
+    </script>
+</body>
+</html>
